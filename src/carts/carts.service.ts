@@ -1,108 +1,32 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-
+import { DatabaseService } from '@app/database';
+import { Cart } from '@app/database/schemas/cart.schema';
+import { Injectable } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { AddItemDto } from './dto/addItem-cart.dto';
-import { CartRepository } from './schema/cart.repository';
-import { ProductsService } from 'src/products/products.service';
-import { MailService } from 'src/mail/mail.service';
-import { UsersService } from 'src/users/users.service';
+import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Injectable()
 export class CartsService {
-  constructor(  
-    private readonly cartRepository: CartRepository,
-    private readonly productsService : ProductsService,
-    private readonly mailService: MailService,
-    private readonly userService: UsersService,
-  ) {}
-  
-  /**
-   * 
-   * @param createCartDto 
-   * @returns 
-   */
-  async create(createCartDto: CreateCartDto) {
-    const existCart = await this.cartRepository.findOneUser(createCartDto.user_id);
-    if (existCart) {
-      throw new NotFoundException('This cart does exist');
-    }else {
-       const newcart = await this.cartRepository.create(createCartDto);
-        newcart.total = 0;
-        newcart.status = "creada";
-       const updatecart = await this.cartRepository.update( newcart._id, newcart );
-       return updatecart;
-    }
+  constructor(private database: DatabaseService) {}
+
+  async create(createCartDto: CreateCartDto): Promise<Cart> {
+    const newProduct =  await this.database.Cart().create(createCartDto)
+    return newProduct;
   }
 
-  /**
-   * 
-   * @returns 
-   */
-  async findAll() {
-    return await this.cartRepository.findAll();
+  findAll() {
+    return `This action returns all carts`;
   }
 
-  /**
-   * 
-   * @param id 
-   * @returns 
-   */
-  async findOne(id: string) {
-    return await this.cartRepository.findOne(id);
+  findOne(id: string) {
+    return `This action returns a #${id} cart`;
   }
 
-  /**
-   * 
-   * @param id 
-   * @param addItemDto 
-   * @returns 
-   */
-  async update(id: string, addItemDto: AddItemDto) {
-
-    const cart = await this.cartRepository.findOne(id);
-    
-    const product = await this.productsService.findOne(addItemDto.product_id);
-    addItemDto.subtotal = product.price * addItemDto.quantity;
-    
-    await cart.items.push(addItemDto);
-
-    cart.total = addItemDto.subtotal + cart.total;
-    cart.status = "comprando"
-    
-    const cartupdate = await this.cartRepository.update( cart._id, cart );
-    return cartupdate;
+  async update(id: string, updateCartDto: UpdateCartDto): Promise<Cart> {
+    const updateCart = await this.database.Cart().update(id, updateCartDto)
+    return updateCart;
   }
 
-  /**
-   * 
-   * @param id 
-   */
-  async closeCart(id: string){
-    const cart = await this.cartRepository.findOne(id);
-    if(!cart){
-      throw new HttpException(
-        'Cart no exist',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const user = await this.userService.findOneById(cart.user_id);
-    if(!user){
-      throw new HttpException(
-        'User no exist',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    cart.status = "cerrada";
-    const cartupdate = await this.cartRepository.update( cart._id, cart );
-    await this.mailService.sendMailNewBuy(user, cartupdate) ;
-  }
-
-  /**
-   * 
-   * @param id 
-   * @returns 
-   */
-  async remove(id: string) {
-    return await this.cartRepository.remove(id);
+  remove(id: string) {
+    return `This action removes a #${id} cart`;
   }
 }

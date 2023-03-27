@@ -1,45 +1,52 @@
+
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from './schema/user.repository';
+import { DatabaseService } from '@app/database';
+import * as bcrypt from 'bcrypt';
+
+import { CreateUserDto } from './dto/create-user.dto';
+import { User } from '@app/database/schemas/user.schema';
+
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
-
-  /**
-   * 
-   * @param username 
-   * @returns 
-   */
-  async findOneUsername(username): Promise<any> {
-    return this.usersRepository.findOneUsername(username);
+  constructor(private database: DatabaseService) {}
+  
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    /*
+    const { password } = createUserDto;
+    const plainToHash = awair bycrypt.hash(password, 10);
+    createUserDto = {... createUserDto, password: plainToHash}
+    */
+    return this.database.User().create(createUserDto);
   }
 
-  /**
-   * 
-   * @param email 
-   * @returns 
-   */
-  async findOneEmail(email): Promise<any> {
-    return this.usersRepository.findOneEmail(email);
+  async findAll(): Promise<User[]> {
+    return this.database.User().getAll();
   }
 
-  /**
-   * 
-   * @param id 
-   * @returns 
-   */
-  async findOneById(id): Promise<any> {
-    const findOneById = await this.usersRepository.findOneById(id);
-    return findOneById;
+  async findOne(id: string): Promise<User | undefined> {
+    const user = this.database.User().get(id);
+    return user
+  }
+  
+  async findOneByUsername(username: string): Promise<User | undefined> {
+    const user = this.database.User().getOne(username );
+    return user
+    
   }
 
-  /**
-   * 
-   * @param user 
-   * @returns 
-   */
-  async createOne(user): Promise<any> {
-    const createOne = await this.usersRepository.createOne(user);
-    return createOne;
+  async findOneByEmail(email: string):Promise<User | undefined> {
+    const user = await this.database.User().getOne(email);
+    return user;
+  }
+  
+  async update(id: string, createUserDto: CreateUserDto):Promise<User> {
+    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    return this.database.User().update(id, createUserDto);
+  }
+
+  async remove(id: string) {
+    return this.database.User().delete(id);
   }
 }

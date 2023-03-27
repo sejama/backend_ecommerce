@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { MessagesRepository } from './schema/message.repository';
-import { Message, MessageSchema } from './schema/message.schema';
+import { DatabaseModule } from '@app/database';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
-  ],
+  imports:[DatabaseModule],
   controllers: [MessagesController],
-  providers: [MessagesService, MessagesRepository],
-  exports: [MessagesService],
+  providers: [MessagesService]
 })
 export class MessagesModule {}

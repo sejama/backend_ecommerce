@@ -1,54 +1,33 @@
+import { DatabaseService } from '@app/database';
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductRepository } from './schema/product.repository';
+import { Product } from './entities/product.entity';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly productRepository: ProductRepository) {}
-
-  /**
-   * 
-   * @param createProductDto 
-   * @returns 
-   */
-  create(createProductDto: CreateProductDto) {
-    return this.productRepository.create(createProductDto);
+  constructor(private database: DatabaseService) {}
+  
+  async create(createProductDto: CreateProductDto):  Promise<Product> {
+    const newProduct =  await this.database.Product().create(createProductDto)
+    return newProduct;
   }
 
-  /**
-   * 
-   * @returns 
-   */
-  findAll() {
-    return this.productRepository.findAll();
+  async findAll(): Promise<Product[]> {
+    return await this.database.Product().getAll();
   }
 
-  /**
-   * 
-   * @param id 
-   * @returns 
-   */
-  findOne(id: string) {
-    return this.productRepository.findOne(id);
+  async findOne(id: string):  Promise<Product> {
+    return await this.database.Product().get(id) ;
   }
 
-  /**
-   * 
-   * @param id 
-   * @param updateProductDto 
-   * @returns 
-   */
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return this.productRepository.update(id, updateProductDto);
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const updateProduct =  await this.database.Product().update(id,updateProductDto)
+    return updateProduct;
   }
 
-  /**
-   * 
-   * @param id 
-   * @returns 
-   */
-  remove(id: string) {
-    return this.productRepository.remove(id);
+  async remove(id: string): Promise<Product[]> {
+    await this.database.Product().delete(id);  
+    return await this.database.Product().getAll();;
   }
 }

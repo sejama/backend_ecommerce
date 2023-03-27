@@ -1,35 +1,36 @@
 import { IsDate, IsNotEmpty, IsString, Length, Min, IsNumber } from 'class-validator'; //@nestjs/class-validator
 import { ApiProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-
 export class CreateProductDto {
+  _id: Types.ObjectId;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @Length(5, 100)
-  title: string;
+  nombre: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @Length(1, 255)
-  description: string;
+  descripcion: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @Length(1, 5)
-  code: string;
+  codigo: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  thumbnail: string;
+  foto: string;
 
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  price: number;
+  precio: number;
 
   @ApiProperty()
   @IsNumber()

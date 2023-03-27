@@ -1,24 +1,26 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { LoginUserDto } from 'src/users/dto/login-user.dto';
-import { RegisterUserDto } from 'src/users/dto/register-user.dto';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard } from './local-auth.guard';
+
+import { AuthService } from './auth.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { LoginUserDto } from 'src/users/dto/login-user.dto';
+
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.authService.login(loginUserDto);
-  }
 
   @Post('register')
-  async create(@Body() registerUserDto: RegisterUserDto) {
-    return this.authService.register(registerUserDto);
+  register(@Body() userObject: CreateUserDto) {
+    return this.authService.register(userObject);
   }
+
+  @Post('login')
+  login(@Body() loginAuthDto: LoginUserDto) {
+    return this.authService.login(loginAuthDto);
+  }
+
+  
 }
