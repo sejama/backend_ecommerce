@@ -19,7 +19,7 @@ export class MailService {
    */
   async sendMailNewUser(user: User) {
     const mail = await this.mailerService.sendMail({
-        to: user.email,
+        to: [user.email, process.env.MAIL_FROM],
         subject: `Nuevo Registro`,
         html: `<h1 style="color: blue;">Hola ${user.firstname} ${user.lastname}!!! te damos la bienvenida al sistema backend ecommerce!!!</h1>`,
     })
