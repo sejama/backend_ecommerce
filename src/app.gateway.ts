@@ -1,11 +1,11 @@
 import {
-  SubscribeMessage,
+  OnGatewayInit,
   OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
   MessageBody,
   WebSocketGateway,
   WebSocketServer,
-  OnGatewayInit,
-  OnGatewayDisconnect,
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { CreateMessageDto } from './messages/dto/create-message.dto';
@@ -13,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { MessagesService } from './messages/messages.service';
 
+//@WebSocketGateway(80{
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -23,8 +24,7 @@ export class AppGateway
 {
   constructor(private readonly messagesService: MessagesService) {}
 
-  @WebSocketServer()
-  server: Server;
+  @WebSocketServer() server: Server;
 
   private logger: Logger = new Logger('AppGateway');
 
@@ -33,22 +33,22 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: CreateMessageDto,
   ): Promise<void> {
-    await this.messagesService.create(payload);
+    await this.messagesService.createMessage(payload);
     await this.server.emit('response_message', payload);
   }
 
   afterInit(server: Server) {
+    console.log(`afterInit`)
     this.logger.log(server);
-    //Do stuffs
-  }
-
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
-    //Do stuffs
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
+    console.log(`Client connected: ${client.id}`)
     this.logger.log(`Client connected: ${client.id}`);
-    //Do stuffs
   }
+
+  handleDisconnect(client: Socket) {
+    console.log(`Client disconnected: ${client.id}`)
+    this.logger.log(`Client disconnected: ${client.id}`);
+  }  
 }

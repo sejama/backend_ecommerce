@@ -1,29 +1,43 @@
-import { DatabaseService } from '@app/database';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
+import { ChatsRepository } from './schema/chats.repository';
 
 @Injectable()
 export class ChatsService {
-  constructor(private database: DatabaseService) {}
+  constructor(
+    private readonly chatsRepository: ChatsRepository,
+    private readonly userService: UsersService
+    ) {}
 
-  async create(createChatDto: CreateChatDto) {
-    return await this.database.Chat().create(createChatDto);
+  /**
+  * 
+  * @param createChatDto 
+  * @returns 
+  */
+  async createChat(createChatDto: CreateChatDto) {
+    const datos = createChatDto.members
+    console.log(datos.length)
+    for (let index = 0; index < datos.length; index++) {
+      console.log(datos[index])
+      const userfind = await this.userService.findOneById(datos[index])
+      console.log(userfind)
+      
+      if(userfind){
+        throw new NotFoundException('User not found');
+      }else{
+        return await this.chatsRepository.createChat(createChatDto);
+      }
+    }
+    
   }
 
-  findAll() {
-    return `This action returns all chats`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
-  }
-
-  update(id: number, updateChatDto: UpdateChatDto) {
-    return `This action updates a #${id} chat`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  /**
+   * 
+   * @param id 
+   * @returns 
+   */
+  async findAllChats(id: string) {
+    return await this.chatsRepository.findAllChats(id);
   }
 }

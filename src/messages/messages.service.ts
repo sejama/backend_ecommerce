@@ -1,29 +1,26 @@
-import { DatabaseService } from '@app/database';
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { MessagesRepository } from './schema/message.repository';
 
 @Injectable()
 export class MessagesService {
-  constructor(private database: DatabaseService) {}
+  constructor(private readonly messagesRepository: MessagesRepository) {}
 
-  async create(createMessageDto: CreateMessageDto) {
-    return await this.database.Message().create(createMessageDto)
+  /**
+   * 
+   * @param createMessageDto 
+   * @returns 
+   */
+  async createMessage(createMessageDto: CreateMessageDto) {
+    return await this.messagesRepository.createMessage(createMessageDto);
   }
 
-  findAll() {
-    return `This action returns all messages`;
-  }
-
-  findOne(id: string) {
-    return `This action returns a #${id} message`;
-  }
-
-  update(id: string, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} message`;
+  /**
+   * 
+   * @param id 
+   * @returns 
+   */
+  async findAllMessages(id: string) {
+    return await this.messagesRepository.findAllMessages(id);
   }
 }

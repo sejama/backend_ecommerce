@@ -12,17 +12,17 @@ import { ProductsService } from 'src/products/products.service';
     ConfigModule.forRoot(),
     MailerModule.forRoot({
       transport: {
-        host: process.env.MAIL_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.MAIL_PORT) || 465,
+        host: process.env.MAIL_HOST,
+        port: parseInt(process.env.MAIL_PORT),
         ignoreTLS: true,
         secure: true,
         auth: {
-            user:process.env.MAIL_USER || 'sejama3@gmail.com',
-            pass:process.env.MAIL_PASSWORD ||'eqlwmatsmspgrkmm'
+            user:process.env.MAIL_USER,
+            pass:process.env.MAIL_PASSWORD
         },
       },
       defaults: {
-        from:process.env.MAIL_FROM || 'sejama3@gmail.com',
+        from:process.env.MAIL_FROM,
     }  
   }),
 ],

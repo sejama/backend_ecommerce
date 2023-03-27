@@ -1,33 +1,70 @@
-import { DatabaseService } from '@app/database';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Product } from './entities/product.entity';
+import { ProductRepository } from './schema/product.repository';
 
 @Injectable()
 export class ProductsService {
-  constructor(private database: DatabaseService) {}
-  
-  async create(createProductDto: CreateProductDto):  Promise<Product> {
-    const newProduct =  await this.database.Product().create(createProductDto)
-    return newProduct;
+  constructor(private readonly productRepository: ProductRepository) {}
+
+  /**
+   * 
+   * @param createProductDto 
+   * @returns 
+   */
+  create(createProductDto: CreateProductDto) {
+    return this.productRepository.create(createProductDto);
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.database.Product().getAll();
+  /**
+   * 
+   * @returns 
+   */
+  findAll() {
+    return this.productRepository.findAll();
   }
 
-  async findOne(id: string):  Promise<Product> {
-    return await this.database.Product().get(id) ;
+  /**
+   * 
+   * @param id 
+   * @returns 
+   */
+  async findOne(id: string) {
+    const prod = await this.productRepository.findOne(id);
+    if(prod){
+      return prod;
+    }else{
+      throw new NotFoundException('Product not found');
+    }
+    
   }
 
+  /**
+   * 
+   * @param id 
+   * @param updateProductDto 
+   * @returns 
+   */
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const updateProduct =  await this.database.Product().update(id,updateProductDto)
-    return updateProduct;
+    const prod = await this.productRepository.update(id, updateProductDto);
+    if(prod){
+      return prod;
+    }else{
+      throw new NotFoundException('Product not found');
+    }
   }
 
-  async remove(id: string): Promise<Product[]> {
-    await this.database.Product().delete(id);  
-    return await this.database.Product().getAll();;
+  /**
+   * 
+   * @param id 
+   * @returns 
+   */
+  async remove(id: string) {
+    const prod = await this.productRepository.remove(id);
+    if(prod){
+      return prod;
+    }else{
+      throw new NotFoundException('Product not found');
+    }
   }
 }
