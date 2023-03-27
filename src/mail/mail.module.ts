@@ -3,9 +3,12 @@ import { Module } from '@nestjs/common';
 import { defaults, transport } from './mail.config';
 import { MailService } from './mail.service';
 import { ConfigModule } from '@nestjs/config';
+import { ProductsModule } from 'src/products/products.module';
+import { ProductsService } from 'src/products/products.service';
 
 @Module({
   imports: [
+    ProductsModule,
     ConfigModule.forRoot(),
     MailerModule.forRoot({
       transport: {

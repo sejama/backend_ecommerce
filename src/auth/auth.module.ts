@@ -8,7 +8,6 @@ import { AuthController } from './auth.controller';
 import { LocalStrategy } from './local.strategy';
 import { jwtConstants } from './constants';
 import { MailModule } from 'src/mail/mail.module';
-import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ import { MailService } from 'src/mail/mail.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStategy, MailService],
+  providers: [AuthService, LocalStrategy, JwtStategy],
   exports: [AuthService],
 })
 export class AuthModule {}

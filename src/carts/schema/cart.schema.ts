@@ -9,7 +9,7 @@ export class Cart {
     @Prop()
     items: [{
         product_id: Types.ObjectId,
-        count: number,
+        quantity: number,
         subtotal: number 
       }];
 
