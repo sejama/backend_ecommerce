@@ -1,8 +1,8 @@
 {
   "name": "ecommerce",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Proyecto final del curso de backend con el desarrollo de un ecommerce",
+  "author": "Sebastian Maidana",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
