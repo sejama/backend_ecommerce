@@ -6,6 +6,7 @@ import { CartRepository } from './schema/cart.repository';
 import { ProductsService } from 'src/products/products.service';
 import { MailService } from 'src/mail/mail.service';
 import { UsersService } from 'src/users/users.service';
+import { isValidObjectId } from 'mongoose';
 
 @Injectable()
 export class CartsService {
@@ -22,9 +23,12 @@ export class CartsService {
    * @returns 
    */
   async create(createCartDto: CreateCartDto) {
+    if(!isValidObjectId(createCartDto.user_id)){
+      throw new NotFoundException()
+    }
     const existCart = await this.cartRepository.findOneUser(createCartDto.user_id);
     if (existCart) {
-      throw new NotFoundException('This cart does exist');
+      throw new NotFoundException();
     }else {
        const newcart = await this.cartRepository.create(createCartDto);
         newcart.total = 0;
@@ -48,7 +52,11 @@ export class CartsService {
    * @returns 
    */
   async findOne(id: string) {
-    return await this.cartRepository.findOne(id);
+    const cart = isValidObjectId(id) && await this.cartRepository.findOne(id);
+    if (!cart) {
+      throw new NotFoundException()
+    }
+    return cart
   }
 
   /**
@@ -59,9 +67,12 @@ export class CartsService {
    */
   async update(id: string, addItemDto: AddItemDto) {
 
-    const cart = await this.cartRepository.findOne(id);
+    const cart = isValidObjectId(id) && await this.cartRepository.findOne(id);
+    if(!cart){
+      throw new NotFoundException();
+    }
     
-    const product = await this.productsService.findOne(addItemDto.product_id);
+    const product = isValidObjectId(addItemDto.product_id) &&  await this.productsService.findOne(addItemDto.product_id);
     addItemDto.subtotal = product.price * addItemDto.quantity;
     
     await cart.items.push(addItemDto);
@@ -78,19 +89,13 @@ export class CartsService {
    * @param id 
    */
   async closeCart(id: string){
-    const cart = await this.cartRepository.findOne(id);
+    const cart = isValidObjectId(id) && await this.cartRepository.findOne(id);
     if(!cart){
-      throw new HttpException(
-        'Cart no exist',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new NotFoundException();
     }
-    const user = await this.userService.findOneById(cart.user_id);
+    const user = isValidObjectId(cart.user_id) && await this.userService.findOneById(cart.user_id);
     if(!user){
-      throw new HttpException(
-        'User no exist',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new NotFoundException();
     }
     cart.status = "cerrada";
     const cartupdate = await this.cartRepository.update( cart._id, cart );
@@ -103,6 +108,10 @@ export class CartsService {
    * @returns 
    */
   async remove(id: string) {
-    return await this.cartRepository.remove(id);
+    const cart = isValidObjectId(id) && await this.cartRepository.remove(id);
+    if(!cart){
+      throw new NotFoundException();
+    }
+    return cart
   }
 }

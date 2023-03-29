@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { isValidObjectId } from 'mongoose';
 import { UsersRepository } from './schema/user.repository';
 
 @Injectable()
@@ -29,7 +30,7 @@ export class UsersService {
    * @returns 
    */
   async findOneById(id): Promise<any> {
-    const findOneById = await this.usersRepository.findOneById(id);
+    const findOneById = isValidObjectId(id) && await this.usersRepository.findOneById(id);
     return findOneById;
   }
 
